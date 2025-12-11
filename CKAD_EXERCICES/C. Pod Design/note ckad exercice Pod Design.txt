@@ -1,0 +1,103 @@
+CKAD _ exercice:
+    Pod Design:
+
+        1: 
+            Create 3 pods with names nginx1, nginx2, nginx3. All of them should have the label app=v1
+                Action:
+                    k run nginx1 --image=nginx --labels=app=v1 --dry-run=client -o yaml > 01_1.yaml
+                    Copier le fichier 01_1.yaml en 01_2.yaml & 01_3.yaml
+                    Editer les fichiers 01_2.yaml & 01_3.yaml pour changer le nom du pod et du container
+                    for i in 1 2 3; do kubectl apply -f 01_$i.yaml; done                
+                Question:
+                    Est-ce qu'il y a la possibilité de variabiliser le contenue du fichier yaml lors de la génération avec kubectl run ?
+
+        2:
+            Show all labels of the pods
+                Action:
+                    for i in 1 2 3; do k describe pod nginx$i | grep -A2 Labels; done
+                Remarque: 
+                    Il est également possible d'avoir cette informations de manière plus propre
+                    Voici un extrait du k get pod -h : Accepts a comma separated list of labels that are going to be presented as columns. Names are case-sensitive. You can also use multiple flag options like -L label1 -L label2...
+                    --show-labels=false:
+                    When printing, show all labels as the last column (default hide labels column)
+
+        3:
+            Change the labels of pod 'nginx' to be app=v2
+                Action: 
+                    # Update pod 'foo' with the label 'unhealthy' and the value 'true'
+                    kubectl label pods nginx2 app=v2 --overwrite
+                Remarque: 
+                    Pour modifier un label existant, il faut ajouter l'option --overwrite, sinon une erreur
+                    est retournée: error: 'app' already has a value (v1), and --overwrite is false
+                    Dans le cas ou le label n'existe pas, l'option --overwrite n'est pas nécessaire.
+                    k label pods nginx2 test=true
+                    pod/nginx2 labeled
+
+                    Il est également possible de modifier le label via un k edit pod nginx2 qui ouvre alors vim et permet de modifier la configuration du pod.
+
+        4: 
+            Get the label 'app' for the pods (show a column with APP labels)
+                Action:
+                    kubectl get pods -L app
+        
+        5:
+            Get only the 'app=v2' pods
+                Action:
+                    kubectl get pods -l app=v2
+                Remarque:
+                    Cette option n'affiche pas le label dans le résultat, pour cela il faut ajouter l'option -L app
+        6:
+            Get 'app=v2' pods and not 'tier=frontend' pods
+                Action:
+                    kubectl get pods -l app=v2,tier!=frontend -L app,tier
+        
+        7:  
+            Add a new label 'tier=web' to all pods habing 'app=v2' or 'app=v1' labels
+                Action:
+                    k label pods -l 'app in (v1,v2)' tier=web
+                Remarque: 
+                    Il est obligatoire ici d'utilier "app in (v1,v2)" pour cibler les pods ayant l'un ou l'autre des labels.
+                    L'utilisation de la virgule "app=v1,app=v2" n'est pas possible dans ce cas car elle signifie un ET logique et non un OU logique.
+        8:
+            Add an annotation 'owner: marketing' to all pods having 'app=v2' label
+                Action:
+                    k annotate pods -l app=v2 owner=marketing
+        
+        9:
+            Remove the 'app' label from the pods we created before
+                Action:
+                    k label pods -all app-
+                Remarque:
+                    Pour supprimer un label il faut ajouter un tiret apres le label que l'on souhaite supprimer. 
+                    C'est comme faire un - label existant
+
+        10:
+            Annotate pods nginx1, nginx2, nginx3 with "description='my description'" value
+                Action:
+                    for i in 1 2 3; do k annotate pod nginx$i description='my description' --overwrite; done
+
+        11:
+            Check the annotation for pod nginx1
+                Action: 
+                    k describe pod nginx1 | grep Annotations -A3
+        12:
+            Remove the annotation 'description' from these three pods
+                Action:
+                    for i in 1 2 3; do k annotate pod nginx$i description-; done
+                Remarque:
+                    Le champ Annotations dans le k describe pod nginx1 est désormais à <none>
+
+        13: remove all pods created before
+                Action:
+                    k delete pod nginx1 nginx2 nginx3
+
+        14: 
+            Create a pod that will be deployed to a Node that has the label 'accelerator=nvidia-tesla-p100'
+                Action:
+                    k run pod-acc --image=nginx -o yaml --dry-run=client --labels "accelerator=nvidia-tesla-p100" > 14.yaml 
+                Remarque:
+                    Pour appliquer le label, faire attention label est au pluriel
+
+        15: 
+            Taint a node wuth key tier and value frontend with the effect NoSchedule. Then, create a pod that totelates this taint. 
+            

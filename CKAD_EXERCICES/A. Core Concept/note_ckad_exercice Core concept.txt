@@ -1,0 +1,186 @@
+CKAD _ exercice:
+    core_concept: 
+        1: Create a namespace called 'mynamespace' and a pod with image nginx called nginx on this namespace
+            Action :
+                k create namespace mynamespace
+                k run nginx --image=nginx -n mynamespace
+            Remarque : 
+                Si la création du namespace n'a pas été faite, la création du pod échoue avec l'erreur suivante : Error from server (NotFound): namespaces "fakens" not found
+        
+        2: Create the pod that was just discribed using a yaml file
+            Action : 
+                Creating a file pod1.yaml with the following content :
+                    apiVersion: v1
+                    kind: Pod
+                    metadata:
+                      name: nginx
+                      namespace: mynamespace
+                    spec:
+                      containers:
+                        - name: nginx
+                          image: nginx:latest
+                Then apply it with the command :
+                    k apply -f pod1.yaml
+            Remarque :
+                Dans le cas où l'on enchaîne avec un 
+                `k apply -f pod1.yaml --dry-run=client` 
+                à la suite de la création du pods, 
+                l'output est plus verbeux car fournit les informations 
+                du contexte actuel.
+
+        3: Get the YAML for a new namespace called 'myns' without creating it
+            Action :
+                k create namespace myns --dry-run=client -o yaml > myns.yaml
+            Remarque :
+                Contenu du fichier myns.yaml :
+                    apiVersion: v1
+                    kind: Namespace
+                    metadata:
+                    name: myns
+                    spec: {}
+                    status: {}
+
+        4: Create a busybox pod (using kubectl command) that runs the command 'env'. Run it and see the output. 
+            Action :  
+                k run busybox --image=busybox --command -- sh -c "env; sleep 3600"
+                k logs busybox
+            Remarque :
+                Le pod doit être créé avec l'option --command qui permet de spécifier une commande personnalisée.
+
+        5: Create the YAML for a new ResourceQuota called 'myrq' with hard limits of 1CPU, 1G memory and 2 pods without creating it         
+            Action : 
+                k create resourcequota myrq --hard=cpu=1,memory=1Gi,pods=2 --dry-run=client -o yaml > myrq.yaml
+            Remarque :
+                Contenu du fichier myrq.yaml :
+                    apiVersion: v1
+                    kind: ResourceQuota
+                    metadata:
+                      name: myrq
+                    spec:
+                      hard:
+                        cpu: "1"
+                        memory: "1Gi"
+                        pods: "2"
+                    status: {}
+
+        6: Get pods on all namespace
+            Action : 
+                kubectl get pods -A 
+                kubectl get pods --all-namespaces
+            Remarque :
+                Les deux commandes sont équivalentes et permettent d'afficher les pods de tous les namespaces.
+                L'affichage indique également les ressources présentes dans le namespace de fonctionnement kube-system. 
+
+        7: Change pod's image to nginx:1.24.0 Observe that the container will be restarted as soon as the image gets pulled. 
+            Action : 
+                #création d'un pod avec l'image nginx:latest
+                k run nginx --image=nginx:latest
+                #changement de l'image du pod nginx
+                k set image pod/nginx nginx=nginx:1.24.0
+                # verification du changement
+                k logs nginx -p 
+            Remarque :
+                L'option -p permet de voir les logs du conteneur précédent, 
+                ce qui est utile pour vérifier que le conteneur a bien été redémarré.
+                    2025/12/08 10:46:14 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+                    2025/12/08 10:46:14 [notice] 30#30: gracefully shutting down
+                    2025/12/08 10:46:14 [notice] 31#31: gracefully shutting down
+                    2025/12/08 10:46:14 [notice] 30#30: exiting
+                    2025/12/08 10:46:14 [notice] 31#31: exiting
+                    2025/12/08 10:46:14 [notice] 29#29: gracefully shutting down
+                    2025/12/08 10:46:14 [notice] 32#32: gracefully shutting down
+                    2025/12/08 10:46:14 [notice] 33#33: gracefully shutting down
+                    2025/12/08 10:46:14 [notice] 32#32: exiting
+                    2025/12/08 10:46:14 [notice] 29#29: exiting
+                    2025/12/08 10:46:14 [notice] 34#34: gracefully shutting down
+                    2025/12/08 10:46:14 [notice] 33#33: exiting
+                    2025/12/08 10:46:14 [notice] 34#34: exiting
+                    2025/12/08 10:46:14 [notice] 31#31: exit
+                    2025/12/08 10:46:14 [notice] 30#30: exit
+                    2025/12/08 10:46:14 [notice] 32#32: exit
+                    2025/12/08 10:46:14 [notice] 29#29: exit
+                    2025/12/08 10:46:14 [notice] 34#34: exit
+                    2025/12/08 10:46:14 [notice] 33#33: exit
+                    2025/12/08 10:46:14 [notice] 36#36: gracefully shutting down
+                    2025/12/08 10:46:14 [notice] 36#36: exiting
+                    2025/12/08 10:46:14 [notice] 36#36: exit
+                    2025/12/08 10:46:14 [notice] 35#35: gracefully shutting down
+                    2025/12/08 10:46:14 [notice] 35#35: exiting
+                    2025/12/08 10:46:14 [notice] 35#35: exit
+                    2025/12/08 10:46:14 [notice] 1#1: signal 17 (SIGCHLD) received from 29
+                    2025/12/08 10:46:14 [notice] 1#1: worker process 29 exited with code 0
+                    2025/12/08 10:46:14 [notice] 1#1: worker process 32 exited with code 0
+                    2025/12/08 10:46:14 [notice] 1#1: worker process 34 exited with code 0
+                    2025/12/08 10:46:14 [notice] 1#1: signal 29 (SIGIO) received
+                    2025/12/08 10:46:14 [notice] 1#1: signal 17 (SIGCHLD) received from 30
+                    2025/12/08 10:46:14 [notice] 1#1: worker process 30 exited with code 0
+                    2025/12/08 10:46:14 [notice] 1#1: worker process 31 exited with code 0
+                    2025/12/08 10:46:14 [notice] 1#1: worker process 33 exited with code 0
+                    2025/12/08 10:46:14 [notice] 1#1: worker process 35 exited with code 0
+                    2025/12/08 10:46:14 [notice] 1#1: worker process 36 exited with code 0
+                    2025/12/08 10:46:14 [notice] 1#1: exit
+
+                    
+                    Events:
+                    Type    Reason     Age                   From               Message
+                    ----    ------     ----                  ----               -------
+                    Normal  Scheduled  5m18s                 default-scheduler  Successfully assigned default/nginx to minikube
+                    Normal  Pulling    5m18s                 kubelet            Pulling image "nginx:latest"
+                    Normal  Pulled     5m16s                 kubelet            Successfully pulled image "nginx:latest" in 2.089s (2.089s including waiting). Image size: 151863538 bytes.
+                    Normal  Killing    4m28s                 kubelet            Container nginx definition changed, will be restarted
+                    Normal  Pulling    4m28s                 kubelet            Pulling image "nginx:1.24.0"
+                    Normal  Pulled     4m6s                  kubelet            Successfully pulled image "nginx:1.24.0" in 22s (22s including waiting). Image size: 142307645 bytes.
+                    Normal  Created    4m5s (x2 over 5m16s)  kubelet            Created container: nginx
+                    Normal  Started    4m5s (x2 over 5m16s)  kubelet            Started container nginx
+
+        8: Get nginx pod's ip create in previous step, use a temp busybox image to wget its '/'
+            Action : 
+                k describe pod nginx | grep IP:
+                k run tmp-busybox --image=busybox --command -- sh -c "wget -qO- <nginx-pod-ip>; sleep 5"
+            Autre méthode : 
+                k get pods -o json | jq -r '.items[].status.podIP'
+            Remarque : 
+                Les pods ont la possibilité de communiquer entre eux, cependant l'adresse ip du pod nginx peux ne pas être fixe. En cas de recréation du pod, l'ip peut changer.
+                Il est donc préférable d'utiliser un service pour exposer le pod nginx et lui attribuer une adresse stable.
+        
+        9: Get pod's YAML
+            Action : 
+                k get pod nginx -o yaml
+
+        10: Get information about the pod, including details about potential issues (e.g. pod hasn't started)
+            Action : 
+                k describe pod nginx
+
+        11: Get pod logs
+            Action : 
+                k logs nginx
+        
+        12: If pod crashed and restarted, get logs about the previous instance
+            Action : 
+                k get pod nginx  # to check if RESTARTS > 0
+                k logs nginx -p
+        
+        13: Execute a simple shell on the nginx pod
+            Action : 
+                k exec -it nginx -- sh
+                # echo he
+                he
+                # exit
+            Remarque :
+                L'option -it permet d'ouvrir une session interactive avec le pod.
+
+        14: Create a busybox pod that echoes 'hello world' and then exists
+            Action : 
+                k run busybox-echo --image=busybox --command -- sh -c "echo 'hello world'"
+                k logs busybox-echo
+
+        15: Do the same, but have the pod deleted automatically when it's completed
+            Action : 
+                k run busybox-echo --rm --image=busybox --command --restart=Never -- sh -c "echo 'hello world'"
+                k logs busybox-echo
+        16: Create an nginx pod and set an env value as 'var1=val1'. Check the env value existence within the pod.
+            Action : 
+                k run nginx --image=nginx --env="var1=val1" --command -- sh -c "env; sleep 3600"
+                k exec -it nginx -- sh -c "echo $var1"
+            Remarque :
+                L'option --env permet de définir une variable d'environnement dans le pod.

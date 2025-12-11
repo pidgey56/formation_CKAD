@@ -1,0 +1,63 @@
+dockerfile : 
+    fichier image permettant de créer des conteneurs pour une application spécifique.
+
+docker build : 
+    commande permettant de créer une image docker à partir d'un dockerfile.
+
+from:
+    instruction dans un dockerfile spécifiant l'image de base à utiliser pour construire une nouvelle image. l'abstraction la plus petite permettant de faire fonctionner une application.
+
+env : 
+    instruction dans un dockerfile permettant de définir des variables d'environnement dans le conteneur.
+
+copy : 
+    instruction dans un dockerfile permettant de copier des fichiers ou des répertoires depuis le système hôte vers le système de fichiers du conteneur.
+
+image: 
+    quelque chose de statique, une fois créé il ne change pas. C'est un snapshot de l'état d'une machine a un instant donné. 
+
+pods : 
+    Plus petite unité de kubernetes. Declaration qui permet de dire quelles sont les ressources attribué à un conteneur. pods permet d'indiquer quelle application il souhaite avoir dans un conteneur. 
+    liaison entre le kubelet et le container runtime. 
+
+    groupe de un ou plusieurs conteneurs avec stockahe partagé et ressources réseau communes. 
+    le contenu d'un pods est toujours partagé et orchestrer 
+
+pod : 
+    unité de base de kubernetes. Isolation logique de un ou plusieurs conteneurs. 
+
+deployments : 
+    état désiré dans lequel l'ensemble des pods doit être configuré. 
+    quel est le plan de construction de l'application. 
+
+service : 
+    Permet de réunir des pods sous une même adresse ip stable qui permet de pouvoir accéder à l'application même si les pods sont déplacés, supprimés ou remplacer.
+    a travers les labels, les services peuvent retrouver les pods correspondants.
+
+nodes : 
+    Machine physique ou virtuelle qui exécute des pods.
+
+Namespace : 
+    Permet de séparer en des environnements logiques au sein d'une même infrastructure kubernetes.
+
+ConfigMaps : 
+    Stockage de données de configuration non sensibles en paires clé/valeur.
+ressource : 
+    Objet qui permet de stocker des données de configuration non sensibles en paires clé/valeur.
+
+Secrets : 
+    Stockage de données sensibles en paire clé/valeur également. 
+    Lorsque que l'on effectue une modifications dans les secrets et/ou configmaps, les objets les utilisant sont automatiquement mis à jour.
+
+Ingress : 
+    Guide les accès externes vers les services adaptés. 
+
+persistentVolumes : 
+    Stockage de données dans un cluster kubernetes permettant de conserver les données même si les pods sont supprimés ou recréés.
+
+Jobs et cronjobs : 
+    Permet d'exécuter des tâches ponctuelles (job) ou récurrentes (cronjob) dans un cluster kubernetes.
+
+replicasets : 
+    Pods de secours (?). Assure qu'un nombre de pods soit toujours en cours d'executions. Instancce de la même application. Seul le nom change. 
+
