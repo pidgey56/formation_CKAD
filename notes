@@ -74,3 +74,14 @@ Jobs et cronjobs :
 replicasets : 
     Pods de secours (?). Assure qu'un nombre de pods soit toujours en cours d'executions. Instancce de la même application. Seul le nom change. 
 
+NodeSelector :
+    Mécanisme simple pour contraindre les pods à s'exécuter sur des nœuds spécifiques en fonction des étiquettes de nœud.
+
+Node Affinity :
+    Mécanisme plus avancé que NodeSelector pour contraindre les pods à s'exécuter sur des nœuds spécifiques en fonction des étiquettes de nœud, avec des règles de préférence et d'exigence.
+    possibilité de mettre des règles de préférence (soft) ou d'exigence (hard) ainsi que des poids pour chaque règle.
+    il y a deux types d'affinité de noeud : 
+        - requiredDuringSchedulingIgnoredDuringExecution : règles d'affinité obligatoires (hard) qui doivent être satisfaites pour que le pod soit programmé sur un nœud.
+        - preferredDuringSchedulingIgnoredDuringExecution : règles d'affinité préférées (soft) qui sont prises en compte lors de la planification du pod, mais ne sont pas obligatoires.
+
+

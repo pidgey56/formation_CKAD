@@ -107,6 +107,158 @@ CKAD _ exercice:
                     k taint nodes minikube tier=frontend:NoSchedule
                     #pour supprimer le taint 
                     k taint nodes minikube tier-
-
+                    apiVersion: v1
+                    creation d'un fichier 15.yaml avec le contenu suivant:
+                        kind: Pod
+                        metadata:
+                        labels:
+                            run: tainted-pod
+                        name: tainted-pod
+                        spec:
+                        containers:
+                        - image: nginx
+                            name: tainted-pod
+                            resources: {}
+                        dnsPolicy: ClusterFirst
+                        restartPolicy: Always
+                        nodeSelector: 
+                            kubernetes.io/hostname: minikube
+                        tolerations:
+                        - key: "tier"
+                            operator: "Equal"
+                            value: "frontend"
+                            effect: "NoSchedule"
+                        status: {}
+                    k apply -f 15.yaml
+        16:
+            Create a deployment with image nginx:1.18.0, called nginx, having 2 replicas, defining port 80 as the port that this container exposes (don't create a service for this deployment)
+                Action: 
+                    k create deployment deploy1 --image=nginx:1.18.0 --replicas=2 --port=80 --dry-run=Client -o yaml > 16.yaml
+                    cat 16.yaml
+                        apiVersion: apps/v1
+                        kind: Deployment
+                        metadata:
+                        labels:
+                            app: deploy1
+                        name: deploy1
+                        spec:
+                        replicas: 2
+                        selector:
+                            matchLabels:
+                            app: deploy1
+                        strategy: {}
+                        template:
+                            metadata:
+                            labels:
+                                app: deploy1
+                            spec:
+                            containers:
+                            - image: nginx:1.18.0
+                                name: nginx
+                                ports:
+                                - containerPort: 80
+                                resources: {}
+                        status: {}
+                    k apply -f 16.yaml
+            17:
+                View the YAML of this deployment
+                    Action:
+                        k get deployment deploy1 -o yaml
             
+            18:
+                View the YAML of the replica set that was created by this deployment
+                    Action:
+                        k get rs -l app=deploy1 -o yaml
+            19: 
+                Get the YAML for one of the pods 
+                    Action: 
+                        k get pods deploy1-85bc45f967-bsqxw -o yaml
+            20:
+                Check how the deployment rollout is going
+                    Action:
+                        k rollout status deployment deploy1             
 
+            21: 
+                Update the nginx image to nginx:1.19.8
+                    Action:
+                        k set image deployment deploy1 nginx=nginx:1.19.8
+                    Remarque: 
+                        Après la mise à jour de l'image, on peut vérifier que le déploiement s'est bien passé avec la commande k rollout status deployment deploy1
+                        On peut également vérifier l'historique des déploiements avec k rollout history deployment deploy1
+                        Pour revenir à une version précédente, on peut utiliser k rollout undo deployment deploy1 --to-revision=1 (ou le numéro de révision souhaité)
+                        On observe également la création d'un nouveau replicaset.
+            22:
+                Do an on-purpose update of the deployment with a wrong image ngninx:1.91
+                    Action:
+                        k set image deployment deploy1 nginx=ngninx:1.91
+                    Remarque:
+                        Après cette mise à jour volontairement erronée, on peut vérifier le statut du déploiement avec k rollout status deployment deploy1
+                        On constate que le déploiement est bloqué car l'image n'existe pas.
+                        On remarque également que les pods précédent ne sont pas supprimés tant que le nouveau déploiement n'est pas réussi.
+            23:
+                Verify that something's wrong with the rollout
+                    Action: 
+                        k rollout status deployment deploy1
+                    Remarque:
+                        Le message d'erreur indique "Waiting for deployment "deploy1" rollout to finish: 1 out of 2 new replicas have been updated..." qui signifie qu'un pod a été crééé mais n'a pas pu démarrer correctement.
+            24:
+                Return the deployment to the second revision (number2) and verify the image is nginx:1.19.8
+                    Action:
+                        k rollout undo deployment deploy1 --to-revision=2
+                    Remarque:
+                        Après cette commande, on peut vérifier que le déploiement est revenu à la version précédente avec k rollout status deployment deploy1
+                        On peut également vérifier l'image des pods avec k get pods -o wide | grep deploy1
+            25: 
+                Check the details of the fourth revision (number 4)
+                    Action:
+                        k rollout history deployment deploy1 --revision=4
+            
+            26:
+                Scale the deployment to 5 replicas
+                    Action: 
+                        k scale --current-replicas=2 --replicas=5 deployment deploy1
+
+            27:
+                Autoscale the deployment, pods between 5 and 10, targeting CPU utilisation at 80%
+                    Action: 
+                        k autoscale deploy deploy1 --min=5 --max=10 --cpu=80%
+                        k get hpa deploy1
+                    Remarque:
+                        hpa signifie Horizontal Pod Autoscaler
+            28:
+                Pause the rollout of the deployment
+                    Action:
+                        k rollout pause deployment deploy1
+            29:
+                Update the image to nginx:1.19.1 and check that there's nothing going on, since we paused the rollout
+                    Action:
+                        k set image deployment deploy1 nginx=nginx:1.19.1
+                        k rollout status deployment deploy1
+            30:
+                Resume the rollout and check that the update is applied
+                    Action:
+                        k rollout resume deployment deploy1
+                        k rollout status deployment deploy1
+
+            31:
+                Delete the deployment and the Horizontal Pod Autoscaler you created
+                    Action:
+                        k delete deployment deploy1
+                        k delete hpa deploy1
+                    Remarque:
+                        La suppression du déploiement entraîne également la suppression des pods associés.
+                        Supprimer le déploiement avant de supprimer le HPA est une bonne pratique pour éviter les erreurs et la création de pods qui pourraient surcharger le cluster.
+            32: 
+                Implement canary deployment by running two instances of nginx marked as version=v1 and version=v2 so that the load is balanced at 75%-25% ratio
+                    Action:
+                        k create deploy my-app-v1 --dry-run=client -o yaml > canary-v1.yaml
+                        k create deploy my-app-v2 --dry-run=client -o yaml > canary-v2.yaml
+                        Editer les fichiers des déploiements pour avoir le nombre correct de réplicats
+                        Ajouter un init conteneur dans chaque déploiement pour éditer le contenu du fichier index.html de nginx pour afficher la version de l'application appelé
+                        k apply -f canary-v1.yaml
+                        k apply -f canary-v2.yaml
+                        k run -it --rm --restart=Never busybox --image=busybox -- /bin/sh -c 'while sleep 1; do wget -qO- my-app-svc; done'
+
+                    Remarque: 
+                        On se rend compte que le service dispatche les appels d'un pod a l'autre avec une plus haute probabilité pour le pod version1
+                
