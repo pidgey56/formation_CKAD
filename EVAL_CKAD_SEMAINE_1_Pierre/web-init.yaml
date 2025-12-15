@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: web-init
+  name: web-init
+spec:
+  initContainers:
+  - image: busybox
+    name: init
+    command: 
+      - "sh"
+      - "-c"
+      - "echo Test CKAD $(date) > /work-dir/index.html"
+    resources: {}
+    volumeMounts:
+    - name: shared-data
+      mountPath: /work-dir
+  containers:
+  - image: nginx:alpine
+    ports:
+    - containerPort: 80
+    name: nginx
+    resources: {}
+    volumeMounts:
+    - name: shared-data
+      mountPath: /usr/share/nginx/html
+  volumes: 
+  - name: shared-data
+    emptyDir: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}

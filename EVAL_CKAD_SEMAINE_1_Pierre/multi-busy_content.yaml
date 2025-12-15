@@ -1,0 +1,177 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Pod","metadata":{"annotations":{},"labels":{"run":"multi-busy"},"name":"multi-busy","namespace":"default"},"spec":{"containers":[{"command":["sh","-c","echo hello \u003e /tmp/hello.txt; sleep 3600"],"image":"busybox","name":"busy1","resources":{},"volumeMounts":[{"mountPath":"/tmp","name":"shared-data"}]},{"command":["sh","-c","sleep 3600"],"image":"busybox","name":"busy2","resources":{},"volumeMounts":[{"mountPath":"/tmp","name":"shared-data"}]}],"dnsPolicy":"ClusterFirst","restartPolicy":"Always","volumes":[{"emptyDir":{},"name":"shared-data"}]},"status":{}}
+  creationTimestamp: "2025-12-11T10:48:12Z"
+  generation: 1
+  labels:
+    run: multi-busy
+  name: multi-busy
+  namespace: default
+  resourceVersion: "2954"
+  uid: a4dd8277-57a7-4d18-ade4-6922ce2ed5eb
+spec:
+  containers:
+  - command:
+    - sh
+    - -c
+    - echo hello > /tmp/hello.txt; sleep 3600
+    image: busybox
+    imagePullPolicy: Always
+    name: busy1
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /tmp
+      name: shared-data
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-wjfkm
+      readOnly: true
+  - command:
+    - sh
+    - -c
+    - sleep 3600
+    image: busybox
+    imagePullPolicy: Always
+    name: busy2
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /tmp
+      name: shared-data
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-wjfkm
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: minikube
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - emptyDir: {}
+    name: shared-data
+  - name: kube-api-access-wjfkm
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2025-12-11T11:09:16Z"
+    observedGeneration: 1
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2025-12-11T10:48:12Z"
+    observedGeneration: 1
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2025-12-11T11:09:16Z"
+    observedGeneration: 1
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2025-12-11T11:09:16Z"
+    observedGeneration: 1
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2025-12-11T10:48:12Z"
+    observedGeneration: 1
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: docker://1ea86e4873fea24388ed856bd488b47dd67fc5ae8d34d259517b9ae0f132ab39
+    image: busybox:latest
+    imageID: docker-pullable://busybox@sha256:d80cd694d3e9467884fcb94b8ca1e20437d8a501096cdf367a5a1918a34fc2fd
+    lastState:
+      terminated:
+        containerID: docker://d1f1b7c26ec412b427d92aa09ca1167517af636e288e417e9671e7d97216ae48
+        exitCode: 255
+        finishedAt: "2025-12-11T11:08:52Z"
+        reason: Error
+        startedAt: "2025-12-11T10:48:14Z"
+    name: busy1
+    ready: true
+    resources: {}
+    restartCount: 1
+    started: true
+    state:
+      running:
+        startedAt: "2025-12-11T11:09:11Z"
+    volumeMounts:
+    - mountPath: /tmp
+      name: shared-data
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-wjfkm
+      readOnly: true
+      recursiveReadOnly: Disabled
+  - containerID: docker://6776857bcc70daa5d56bb06c410efe6d23ca8d03bb5ee22ff22ca425a92b2a5b
+    image: busybox:latest
+    imageID: docker-pullable://busybox@sha256:d80cd694d3e9467884fcb94b8ca1e20437d8a501096cdf367a5a1918a34fc2fd
+    lastState:
+      terminated:
+        containerID: docker://77851de4d82874b2f7e2b59b2e691e988cd92549a38484b56f11bec591cd3e45
+        exitCode: 255
+        finishedAt: "2025-12-11T11:08:52Z"
+        reason: Error
+        startedAt: "2025-12-11T10:48:15Z"
+    name: busy2
+    ready: true
+    resources: {}
+    restartCount: 1
+    started: true
+    state:
+      running:
+        startedAt: "2025-12-11T11:09:15Z"
+    volumeMounts:
+    - mountPath: /tmp
+      name: shared-data
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-wjfkm
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 192.168.49.2
+  hostIPs:
+  - ip: 192.168.49.2
+  observedGeneration: 1
+  phase: Running
+  podIP: 10.244.0.16
+  podIPs:
+  - ip: 10.244.0.16
+  qosClass: BestEffort
+  startTime: "2025-12-11T10:48:12Z"

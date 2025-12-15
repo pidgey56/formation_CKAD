@@ -1,0 +1,53 @@
+Name:             tainted-pod
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             minikube/192.168.49.2
+Start Time:       Mon, 15 Dec 2025 11:29:00 +0100
+Labels:           run=tainted-pod
+Annotations:      <none>
+Status:           Running
+IP:               10.244.0.24
+IPs:
+  IP:  10.244.0.24
+Containers:
+  tainted-pod:
+    Container ID:   docker://bffb17ecb1ac77e8b73336e4ea561021e9a7a9666a4680cacc8c145fdaa294ca
+    Image:          nginx
+    Image ID:       docker-pullable://nginx@sha256:fb01117203ff38c2f9af91db1a7409459182a37c87cced5cb442d1d8fcc66d19
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Mon, 15 Dec 2025 11:29:19 +0100
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-r4jht (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-r4jht:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              kubernetes.io/hostname=minikube
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+                             tier=frontend:NoSchedule
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  69s   default-scheduler  Successfully assigned default/tainted-pod to minikube
+  Normal  Pulling    69s   kubelet            Pulling image "nginx"
+  Normal  Pulled     52s   kubelet            Successfully pulled image "nginx" in 19.717s (19.717s including waiting). Image size: 151914114 bytes.
+  Normal  Created    51s   kubelet            Created container: tainted-pod
+  Normal  Started    51s   kubelet            Started container tainted-pod

@@ -94,10 +94,19 @@ CKAD _ exercice:
         14: 
             Create a pod that will be deployed to a Node that has the label 'accelerator=nvidia-tesla-p100'
                 Action:
-                    k run pod-acc --image=nginx -o yaml --dry-run=client --labels "accelerator=nvidia-tesla-p100" > 14.yaml 
-                Remarque:
-                    Pour appliquer le label, faire attention label est au pluriel
-
+                    minikube node add #création d'un nouveau node
+                    k get node # pour avoir le nom du nouveau node
+                    k label node minikube-m02 accelerator=nvidia-tesla-p100
+                    k get node --show-labels | grep accelerator #vérification du label
+                    k run pod-node --dry-run=client -o yaml --image=nginx > 13.yaml
+                    Editer le fichier 13.yaml pour ajouter le nodeSelector
+                    k apply -f 13.yaml
         15: 
-            Taint a node wuth key tier and value frontend with the effect NoSchedule. Then, create a pod that totelates this taint. 
+            Taint a node with key tier and value frontend with the effect NoSchedule. Then, create a pod that totelates this taint. 
+                Action: 
+                    k taint nodes minikube tier=frontend:NoSchedule
+                    #pour supprimer le taint 
+                    k taint nodes minikube tier-
+
             
+

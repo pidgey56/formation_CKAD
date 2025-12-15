@@ -6,7 +6,8 @@ CKAD _ exercice:
                 k run nginx --image=nginx -n mynamespace
             Remarque : 
                 Si la création du namespace n'a pas été faite, la création du pod échoue avec l'erreur suivante : Error from server (NotFound): namespaces "fakens" not found
-        
+                k get all -A n'affiche pas les objets de type namespace par défaut, il faut utiliser k get namespace ou k get ns pour les voir.
+
         2: Create the pod that was just discribed using a yaml file
             Action : 
                 Creating a file pod1.yaml with the following content :

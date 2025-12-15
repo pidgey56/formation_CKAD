@@ -1,6 +1,15 @@
 dockerfile : 
     fichier image permettant de créer des conteneurs pour une application spécifique.
 
+protocole utilisé pour communiquer entre les éléments : 
+    http, grpc, tcp/udp.
+
+conteneur : 
+    instance en cours d'exécution d'une image docker. environnement isolé dans lequel une application s'exécute.
+
+difference entre conteneur et conteneur principal : 
+    un conteneur principal est un conteneur qui exécute le processus principal d'une application, tandis qu'un conteneur secondaire (ou auxiliaire) est utilisé pour des tâches supplémentaires telles que la journalisation, la surveillance ou la gestion des configurations.
+
 docker build : 
     commande permettant de créer une image docker à partir d'un dockerfile.
 
@@ -26,6 +35,10 @@ pods :
 pod : 
     unité de base de kubernetes. Isolation logique de un ou plusieurs conteneurs. 
 
+conteneur sidecar: 
+    conteneur auxiliaire qui accompagne le conteneur principal dans un pod pour fournir des fonctionnalités supplémentaires telles que la journalisation, la surveillance ou la gestion des configurations.
+    exemple : conteneur de log, conteneur de monitoring, conteneur de proxy.
+    
 deployments : 
     état désiré dans lequel l'ensemble des pods doit être configuré. 
     quel est le plan de construction de l'application. 
